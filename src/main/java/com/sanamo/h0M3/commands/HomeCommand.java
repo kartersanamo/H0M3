@@ -4,6 +4,8 @@ import com.sanamo.h0M3.api.chat.ChatFormat;
 import com.sanamo.h0M3.api.command.CommandContext;
 import com.sanamo.h0M3.api.command.CoreCommand;
 import com.sanamo.h0M3.api.command.annotations.PlayerOnly;
+import com.sanamo.h0M3.api.util.MessagesUtil;
+import com.sanamo.h0M3.api.util.PlaceholderUtil;
 import com.sanamo.h0M3.managers.HomeManager;
 import com.sanamo.h0M3.models.Home;
 import org.bukkit.entity.Player;
@@ -21,7 +23,7 @@ public class HomeCommand extends CoreCommand {
     public HomeCommand(HomeManager homeManager) {
         super(
                 "home",
-                "Teleports a plyer to their home",
+                "Teleports a player to their home",
                 "/home <name>"
         );
         this.homeManager = homeManager;
@@ -33,20 +35,26 @@ public class HomeCommand extends CoreCommand {
         Player player = context.getPlayer();
         UUID uuid = player.getUniqueId();
         if (!context.hasArgs()) {
-            player.sendMessage(ChatFormat.error(this.getUsage()));
+            player.sendMessage(ChatFormat.error(
+                    PlaceholderUtil.replace(MessagesUtil.commandUsage, "%usage%", this.getUsage())
+            ));
             return true;
         }
         String name = context.getArg(0);
 
         // Ensure no color codes in it
         if (homeManager.homeNameHasColor(name)) {
-            player.sendMessage(ChatFormat.error("Home names cannot contain color codes"));
+            player.sendMessage(ChatFormat.error(
+                    PlaceholderUtil.replace(MessagesUtil.homeNameColorCodes)
+            ));
             return true;
         }
 
         // Confirm name
         if (!homeManager.exists(uuid, name)) {
-            player.sendMessage(ChatFormat.error("You do not have a home by the name of " + name));
+            player.sendMessage(ChatFormat.error(
+                    PlaceholderUtil.replace(MessagesUtil.homeNotFoundName, "%name%", name)
+            ));
             return true;
         }
 
@@ -54,7 +62,9 @@ public class HomeCommand extends CoreCommand {
         // Get home & teleport
         Home home = homeManager.getHome(uuid, name);
         if (home == null) {
-            player.sendMessage(ChatFormat.error("I failed to get the home by the name of " + name));
+            player.sendMessage(ChatFormat.error(
+                    PlaceholderUtil.replace(MessagesUtil.homeGetFailed, "%name%", name)
+            ));
             return true;
         }
         home.teleport();

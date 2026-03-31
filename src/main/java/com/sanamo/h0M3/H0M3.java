@@ -1,9 +1,14 @@
 package com.sanamo.h0M3;
 
 import com.sanamo.h0M3.api.command.CommandManager;
+import com.sanamo.h0M3.api.command.SubCommand;
+import com.sanamo.h0M3.api.chat.ChatFormat;
 import com.sanamo.h0M3.api.gui.GUIManager;
 import com.sanamo.h0M3.api.logging.CoreLogger;
 import com.sanamo.h0M3.api.logging.LogLevel;
+import com.sanamo.h0M3.api.util.ConfigUtil;
+import com.sanamo.h0M3.api.util.MessagesUtil;
+import com.sanamo.h0M3.api.util.PlaceholderUtil;
 import com.sanamo.h0M3.commands.*;
 import com.sanamo.h0M3.listeners.PlayerJoinListener;
 import com.sanamo.h0M3.listeners.PlayerQuitListener;
@@ -11,26 +16,25 @@ import com.sanamo.h0M3.listeners.TeleportMoveListener;
 import com.sanamo.h0M3.managers.ChatInputManager;
 import com.sanamo.h0M3.managers.HomeManager;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
 
 public final class H0M3 extends JavaPlugin {
 
     private static H0M3 instance;
     private static CoreLogger logger;
+
     private HomeManager homeManager;
     private CommandManager commandManager;
     private ChatInputManager chatInputManager;
     private GUIManager guiManager;
 
-    // Getters
-    public static H0M3 getInstance() {
-        return instance;
-    }
-
-    public static CoreLogger getLog() {
-        return logger;
-    }
+    private File messagesFile;
+    private FileConfiguration messagesConfig;
 
     @Override
     public void onEnable() {
@@ -41,8 +45,24 @@ public final class H0M3 extends JavaPlugin {
         registerCommands();
         registerListeners();
         loadHomes();
+        saveDefaultConfig();
+        ConfigUtil.load(getConfig());
+        createConfigs();
 
         logger.info(getDescription().getName() + "v" + getDescription().getVersion() + " has been enabled!");
+    }
+
+    private void createConfigs() {
+        // Ensure messages.yml is created
+        messagesFile = new File(getDataFolder(), "messages.yml");
+        if (!messagesFile.exists()) {
+            messagesFile.getParentFile().mkdirs();
+            saveResource("messages.yml", false);
+        }
+
+        messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
+        MessagesUtil.load(messagesConfig);
+        logger.info("Messages cache loaded.");
     }
 
     private void initLogger() {
@@ -58,6 +78,20 @@ public final class H0M3 extends JavaPlugin {
     }
 
     private void registerCommands() {
+        commandManager.registerCommand(new H0M3Command());
+        commandManager.registerSubCommand("h0m3", new SubCommand(
+                "reload",
+                "Reloads plugin messages",
+                "/h0m3 reload",
+                "h0m3.reload",
+                context -> {
+                    reloadMessages();
+                    context.getSender().sendMessage(ChatFormat.success(
+                            PlaceholderUtil.replace(MessagesUtil.messagesReloaded)
+                    ));
+                    return true;
+                }
+        ));
         commandManager.registerCommand(new HomeCommand(homeManager));
         commandManager.registerCommand(new DeleteHomeCommand(homeManager));
         commandManager.registerCommand(new SetHomeCommand(homeManager));
@@ -95,6 +129,28 @@ public final class H0M3 extends JavaPlugin {
         }
     }
 
+    // Getters
+    public static H0M3 getInstance() {
+        return instance;
+    }
+
+    public static CoreLogger getLog() {
+        return logger;
+    }
+
+    public FileConfiguration getMessagesConfig() { return this.messagesConfig;}
+
+    public void reloadMessages() {
+        if (messagesFile == null) {
+            return;
+        }
+        reloadConfig();
+        ConfigUtil.load(getConfig());
+        messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
+        MessagesUtil.load(messagesConfig);
+    }
+
+    // Getters (Managers)
     public ChatInputManager getChatInputManager() {
         return chatInputManager;
     }

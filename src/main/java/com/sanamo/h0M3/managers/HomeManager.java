@@ -2,7 +2,10 @@ package com.sanamo.h0M3.managers;
 
 import com.sanamo.h0M3.api.chat.ColorUtil;
 import com.sanamo.h0M3.api.config.ConfigFile;
+import com.sanamo.h0M3.api.util.ConfigUtil;
 import com.sanamo.h0M3.api.util.LocationUtil;
+import com.sanamo.h0M3.api.util.MessagesUtil;
+import com.sanamo.h0M3.api.util.PlaceholderUtil;
 import com.sanamo.h0M3.api.util.TimeUtil;
 import com.sanamo.h0M3.models.Home;
 import org.bukkit.ChatColor;
@@ -165,8 +168,9 @@ public class HomeManager {
         return getHomeNameToId(uuid);
     }
 
-    public boolean isValidHomeName(String newName) {
-        return (newName.length() < 3 || newName.length() > 16);
+    public boolean isHomeNameCorrectSize(String newName) {
+        return (newName.length() < ConfigUtil.homeNameMinLength
+                || newName.length() > ConfigUtil.homeNameMaxLength);
     }
 
     private String getIdByName(UUID uniqueID, String homeName) {
@@ -221,30 +225,42 @@ public class HomeManager {
     }
 
     public void sendInfo(Home home, Player player) {
-        player.sendMessage(ColorUtil.translate("&8&l&m----------------------------------------"));
-        player.sendMessage(ColorUtil.translate("&4&lHome Information"));
-        player.sendMessage(ColorUtil.translate("&4&l"));
+        player.sendMessage(ColorUtil.translate(MessagesUtil.homeInfoDivider));
+        player.sendMessage(ColorUtil.translate(MessagesUtil.homeInfoTitle));
+        player.sendMessage(ColorUtil.translate(MessagesUtil.homeInfoSpacer));
         List<String> lines = getInformationLines(home);
         for (String line : lines) {
             player.sendMessage(ColorUtil.translate(line));
         }
-        player.sendMessage(ColorUtil.translate("&8&l&m----------------------------------------"));
+        player.sendMessage(ColorUtil.translate(MessagesUtil.homeInfoDivider));
     }
 
     public List<String> getInformationLines(Home home) {
         List<String> lines = new ArrayList<>();
 
-        lines.add(ColorUtil.translate("&7Name - " + home.getDisplayName()));
-        lines.add(ColorUtil.translate("&7Created At - " + TimeUtil.formatUnix(home.getCreatedAt())));
-        lines.add(ColorUtil.translate("&7Last Used - " + TimeUtil.formatUnix(home.getLastUsedAt())));
-        lines.add(ColorUtil.translate("&7Material - " + home.getMaterial().name()));
-        lines.add(ColorUtil.translate("&7Location - " + LocationUtil.format(home.getLocation())));
+        lines.add(ColorUtil.translate(
+                PlaceholderUtil.replace(MessagesUtil.homeInfoName, "%name%", home.getDisplayName())
+        ));
+        lines.add(ColorUtil.translate(
+                PlaceholderUtil.replace(MessagesUtil.homeInfoCreated, "%time%", TimeUtil.formatUnix(home.getCreatedAt()))
+        ));
+        lines.add(ColorUtil.translate(
+                PlaceholderUtil.replace(MessagesUtil.homeInfoLastUsed, "%time%", TimeUtil.formatUnix(home.getLastUsedAt()))
+        ));
+        lines.add(ColorUtil.translate(
+                PlaceholderUtil.replace(MessagesUtil.homeInfoMaterial, "%material%", home.getMaterial().name())
+        ));
+        lines.add(ColorUtil.translate(
+                PlaceholderUtil.replace(MessagesUtil.homeInfoLocation, "%location%", LocationUtil.format(home.getLocation()))
+        ));
         if (home.getLore().isEmpty()) {
-            lines.add(ColorUtil.translate("&7Lore - None"));
+            lines.add(ColorUtil.translate(MessagesUtil.homeInfoLoreNone));
         } else {
-            lines.add(ColorUtil.translate("&7Lore - "));
+            lines.add(ColorUtil.translate(MessagesUtil.homeInfoLoreLabel));
             for (String loreLine : home.getLore()) {
-                lines.add(ColorUtil.translate("&8» &7" + loreLine));
+                lines.add(ColorUtil.translate(
+                        PlaceholderUtil.replace(MessagesUtil.homeInfoLoreEntry, "%line%", loreLine)
+                ));
             }
         }
 

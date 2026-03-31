@@ -5,7 +5,11 @@ import com.sanamo.h0M3.api.chat.ChatFormat;
 import com.sanamo.h0M3.api.chat.ColorUtil;
 import com.sanamo.h0M3.api.gui.GUI;
 import com.sanamo.h0M3.api.item.ItemBuilder;
+import com.sanamo.h0M3.api.util.ConfigUtil;
+import com.sanamo.h0M3.api.util.EffectUtil;
 import com.sanamo.h0M3.api.util.LocationUtil;
+import com.sanamo.h0M3.api.util.MessagesUtil;
+import com.sanamo.h0M3.api.util.PlaceholderUtil;
 import com.sanamo.h0M3.managers.HomeManager;
 import com.sanamo.h0M3.models.Home;
 import org.bukkit.Location;
@@ -24,7 +28,7 @@ public class ManageHomeGUI extends GUI {
     private final Player player;
 
     public ManageHomeGUI(HomeManager homeManager, Home home, Player player) {
-        super("manage_home", "Home Manager", 27);
+        super("manage_home", ColorUtil.translate(MessagesUtil.manageHomeTitle), ConfigUtil.manageHomeGuiSize);
         this.homeManager = homeManager;
         this.home = home;
         this.player = player;
@@ -36,12 +40,12 @@ public class ManageHomeGUI extends GUI {
 
         if (home == null) {
             ItemStack nullItem = new ItemBuilder(Material.BARRIER)
-                    .name(ColorUtil.translate("&c&lERROR"))
+                    .name(ColorUtil.translate(MessagesUtil.manageHomeErrorName))
                     .lore(List.of(
-                            ColorUtil.translate("&7Sorry, but this home is corrupted,"),
-                            ColorUtil.translate("&7invalid, or could not be found."),
-                            ColorUtil.translate("&7Please try deleting the home with"),
-                            ColorUtil.translate("&e/delhome &7and retry. Sorry!")
+                            ColorUtil.translate(MessagesUtil.manageHomeErrorLine1),
+                            ColorUtil.translate(MessagesUtil.manageHomeErrorLine2),
+                            ColorUtil.translate(MessagesUtil.manageHomeErrorLine3),
+                            ColorUtil.translate(MessagesUtil.manageHomeErrorLine4)
                     ))
                     .build();
             setItem(13, nullItem);
@@ -49,12 +53,17 @@ public class ManageHomeGUI extends GUI {
 
         assert home != null;
         ItemStack changeNameItem = new ItemBuilder(Material.NAME_TAG)
-                .name(ColorUtil.translate("&6Change Name"))
+                .name(ColorUtil.translate(MessagesUtil.manageHomeChangeNameTitle))
                 .lore(List.of(
-                        ColorUtil.translate("&eLeft-Click &7here to change"),
-                        ColorUtil.translate("&7the display name of your home."),
-                        " ",
-                        ColorUtil.translate("&eCurrent: &7") + home.getDisplayName()
+                        ColorUtil.translate(MessagesUtil.manageHomeChangeNameLine1),
+                        ColorUtil.translate(MessagesUtil.manageHomeChangeNameLine2),
+                        ColorUtil.translate(MessagesUtil.blankLine),
+                        ColorUtil.translate(
+                                PlaceholderUtil.replace(
+                                        MessagesUtil.manageHomeCurrent,
+                                        "%value%", home.getDisplayName()
+                                )
+                        )
                 ))
                 .build();
         setItem(11, changeNameItem);
@@ -62,12 +71,17 @@ public class ManageHomeGUI extends GUI {
 
         // Change material item
         ItemStack changeMaterialItem = new ItemBuilder(home.getMaterial())
-                .name(ColorUtil.translate("&6Change Material"))
+                .name(ColorUtil.translate(MessagesUtil.manageHomeChangeMaterialTitle))
                 .lore(List.of(
-                        ColorUtil.translate("&eLeft-Click &7here to change"),
-                        ColorUtil.translate("&7the material of your home."),
-                        " ",
-                        ColorUtil.translate("&eCurrent: &7") + home.getMaterial()
+                        ColorUtil.translate(MessagesUtil.manageHomeChangeMaterialLine1),
+                        ColorUtil.translate(MessagesUtil.manageHomeChangeMaterialLine2),
+                        ColorUtil.translate(MessagesUtil.blankLine),
+                        ColorUtil.translate(
+                                PlaceholderUtil.replace(
+                                        MessagesUtil.manageHomeCurrent,
+                                        "%value%", home.getMaterial().toString()
+                                )
+                        )
                 ))
                 .build();
         setItem(12, changeMaterialItem);
@@ -76,23 +90,25 @@ public class ManageHomeGUI extends GUI {
         // Change lore item
         List<String> lore = new ArrayList<>();
 
-        lore.add(ColorUtil.translate("&eLeft-Click &7here to change"));
-        lore.add(ColorUtil.translate("&7the lore of your home."));
-        lore.add(" ");
-        lore.add(ColorUtil.translate("&eCurrent:"));
+        lore.add(ColorUtil.translate(MessagesUtil.manageHomeChangeLoreLine1));
+        lore.add(ColorUtil.translate(MessagesUtil.manageHomeChangeLoreLine2));
+        lore.add(ColorUtil.translate(MessagesUtil.blankLine));
+        lore.add(ColorUtil.translate(MessagesUtil.manageHomeCurrentLabel));
 
         List<String> currentLore = home.getLore();
 
         if (currentLore == null || currentLore.isEmpty()) {
-            lore.add(ColorUtil.translate("&7None"));
+            lore.add(ColorUtil.translate(MessagesUtil.manageHomeLoreNone));
         } else {
             for (String line : currentLore) {
-                lore.add(ColorUtil.translate("&8• &7" + line));
+                lore.add(ColorUtil.translate(
+                        PlaceholderUtil.replace(MessagesUtil.manageHomeLoreEntry, "%line%", line)
+                ));
             }
         }
 
         ItemStack changeLoreItem = new ItemBuilder(Material.PAPER)
-                .name(ColorUtil.translate("&6Change Lore"))
+                .name(ColorUtil.translate(MessagesUtil.manageHomeChangeLoreTitle))
                 .lore(lore)
                 .build();
 
@@ -101,12 +117,17 @@ public class ManageHomeGUI extends GUI {
 
         // Change location item
         ItemStack changeLocationItem = new ItemBuilder(Material.MAP)
-                .name(ColorUtil.translate("&6Change Location"))
+                .name(ColorUtil.translate(MessagesUtil.manageHomeChangeLocationTitle))
                 .lore(List.of(
-                        ColorUtil.translate("&eLeft-Click &7here to change"),
-                        ColorUtil.translate("&7the location of your home."),
-                        " ",
-                        ColorUtil.translate("&eCurrent: &7") + LocationUtil.format(home.getLocation())
+                        ColorUtil.translate(MessagesUtil.manageHomeChangeLocationLine1),
+                        ColorUtil.translate(MessagesUtil.manageHomeChangeLocationLine2),
+                        ColorUtil.translate(MessagesUtil.blankLine),
+                        ColorUtil.translate(
+                                PlaceholderUtil.replace(
+                                        MessagesUtil.manageHomeCurrent,
+                                        "%value%", LocationUtil.format(home.getLocation())
+                                )
+                        )
                 ))
                 .build();
         setItem(14, changeLocationItem);
@@ -114,12 +135,12 @@ public class ManageHomeGUI extends GUI {
 
         // Delete home item
         ItemStack deleteHomeItem = new ItemBuilder(Material.BARRIER)
-                .name(ColorUtil.translate("&6Delete Home"))
+                .name(ColorUtil.translate(MessagesUtil.manageHomeDeleteTitle))
                 .lore(List.of(
-                        ColorUtil.translate("&eLeft-Click &7here to permanently"),
-                        ColorUtil.translate("&7delete your home."),
-                        ColorUtil.translate("&7"),
-                        ColorUtil.translate("&c&lWARNING: THIS IS IRREVERSIBLE!")
+                        ColorUtil.translate(MessagesUtil.manageHomeDeleteLine1),
+                        ColorUtil.translate(MessagesUtil.manageHomeDeleteLine2),
+                        ColorUtil.translate(MessagesUtil.manageHomeDeleteLine3),
+                        ColorUtil.translate(MessagesUtil.manageHomeDeleteLine4)
                 ))
                 .build();
         setItem(15, deleteHomeItem);
@@ -127,10 +148,10 @@ public class ManageHomeGUI extends GUI {
 
         // Back button item
         ItemStack backButtonItem = new ItemBuilder(Material.ARROW)
-                .name(ColorUtil.translate("&c&lGo Back"))
+                .name(ColorUtil.translate(MessagesUtil.manageHomeBackTitle))
                 .lore(List.of(
-                        ColorUtil.translate("&7Left-Click here to go back"),
-                        ColorUtil.translate("&7to the previous page")
+                        ColorUtil.translate(MessagesUtil.manageHomeBackLine1),
+                        ColorUtil.translate(MessagesUtil.manageHomeBackLine2)
                 ))
                 .build();
         setItem(18, backButtonItem);
@@ -139,7 +160,7 @@ public class ManageHomeGUI extends GUI {
         // Home information
         List<String> lines = homeManager.getInformationLines(home);
         ItemStack homeInformationItem = new ItemBuilder(Material.BOOK)
-                .name(ColorUtil.translate("&6Home Information"))
+                .name(ColorUtil.translate(MessagesUtil.manageHomeInfoTitle))
                 .lore(lines)
                 .build();
         setItem(22, homeInformationItem);
@@ -150,20 +171,39 @@ public class ManageHomeGUI extends GUI {
         player.closeInventory();
         H0M3.getInstance().getChatInputManager().awaitInput(
                 player,
-                "&ePlease type the new name for your home",
+                MessagesUtil.promptChangeName,
                 input -> {
                     String oldName = home.getDisplayName();
-                    if (homeManager.isValidHomeName(input)) {
-                        player.sendMessage(ChatFormat.error("That is not a valid home name"));
+                    if (homeManager.isHomeNameCorrectSize(input)) {
+                        player.sendMessage(ChatFormat.error(
+                                PlaceholderUtil.replace(MessagesUtil.homeNameInvalid)
+                        ));
                     } else {
                         this.home.setDisplayName(input);
                         homeManager.update(home);
-                        player.sendMessage(ChatFormat.info("Successfully changed your home's name (" + oldName + " → " + input + ")"));
+                        player.sendMessage(ChatFormat.info(
+                                PlaceholderUtil.replace(
+                                        MessagesUtil.homeNameChanged,
+                                        "%old%", oldName,
+                                        "%new%", input
+                                )
+                        ));
+                        EffectUtil.play(
+                                player,
+                                ConfigUtil.renameHomeSound,
+                                ConfigUtil.renameHomeSoundVolume,
+                                ConfigUtil.renameHomeSoundPitch,
+                                ConfigUtil.renameHomeParticle,
+                                ConfigUtil.renameHomeParticleCount,
+                                ConfigUtil.renameHomeParticleRadius
+                        );
                     }
                     ManageHomeGUI manageHomeGUI = new ManageHomeGUI(homeManager, home, player);
                     manageHomeGUI.open(player);
                 },
-                () -> player.sendMessage(ChatFormat.error("Name input cancelled"))
+                () -> player.sendMessage(ChatFormat.error(
+                        PlaceholderUtil.replace(MessagesUtil.nameInputCancelled)
+                ))
         );
     }
 
@@ -171,21 +211,40 @@ public class ManageHomeGUI extends GUI {
         player.closeInventory();
         H0M3.getInstance().getChatInputManager().awaitInput(
                 player,
-                "&ePlease type the name of the new material for your home (EX: DIAMOND_BLOCK, GRASS, STONE, etc.)",
+                MessagesUtil.promptChangeMaterial,
                 input -> {
                     Material newMaterial = Material.getMaterial(input);
                     Material oldMaterial = home.getMaterial();
                     if (newMaterial == null) {
-                        player.sendMessage(ChatFormat.error("Failed to grab the material by that name"));
+                        player.sendMessage(ChatFormat.error(
+                                PlaceholderUtil.replace(MessagesUtil.homeMaterialInvalid)
+                        ));
                     } else {
                         this.home.setMaterial(newMaterial);
                         homeManager.update(home);
-                        player.sendMessage(ChatFormat.info("Successfully updated your home's material (" + oldMaterial.name() + " → " + newMaterial.name() + ")"));
+                        player.sendMessage(ChatFormat.info(
+                                PlaceholderUtil.replace(
+                                        MessagesUtil.homeMaterialUpdated,
+                                        "%old%", oldMaterial.name(),
+                                        "%new%", newMaterial.name()
+                                )
+                        ));
+                        EffectUtil.play(
+                                player,
+                                ConfigUtil.editMaterialSound,
+                                ConfigUtil.editMaterialSoundVolume,
+                                ConfigUtil.editMaterialSoundPitch,
+                                ConfigUtil.editMaterialParticle,
+                                ConfigUtil.editMaterialParticleCount,
+                                ConfigUtil.editMaterialParticleRadius
+                        );
                     }
                     ManageHomeGUI manageHomeGUI = new ManageHomeGUI(homeManager, home, player);
                     manageHomeGUI.open(player);
                 },
-                () -> player.sendMessage(ChatFormat.error("Material input cancelled"))
+                () -> player.sendMessage(ChatFormat.error(
+                        PlaceholderUtil.replace(MessagesUtil.materialInputCancelled)
+                ))
         );
     }
 
@@ -193,11 +252,13 @@ public class ManageHomeGUI extends GUI {
         player.closeInventory();
         H0M3.getInstance().getChatInputManager().awaitInput(
                 player,
-                "&ePlease enter the new lore for your home (Use | to separate lines)",
+                MessagesUtil.promptChangeLore,
                 input -> {
 
                     if (input == null || input.trim().isEmpty()) {
-                        player.sendMessage(ChatFormat.error("Lore cannot be empty"));
+                        player.sendMessage(ChatFormat.error(
+                                PlaceholderUtil.replace(MessagesUtil.homeLoreEmpty)
+                        ));
                         return;
                     }
 
@@ -207,18 +268,36 @@ public class ManageHomeGUI extends GUI {
                             .toList();
 
                     if (lore.isEmpty()) {
-                        player.sendMessage(ChatFormat.error("Lore must contain at least one line"));
+                        player.sendMessage(ChatFormat.error(
+                                PlaceholderUtil.replace(MessagesUtil.homeLoreMinLines)
+                        ));
                         return;
                     }
 
                     this.home.setLore(lore);
                     homeManager.update(home);
-                    player.sendMessage(ChatFormat.info("Successfully updated your home's lore to " + lore.size() + " lines"));
+                    player.sendMessage(ChatFormat.info(
+                            PlaceholderUtil.replace(
+                                    MessagesUtil.homeLoreUpdated,
+                                    "%count%", String.valueOf(lore.size())
+                            )
+                    ));
+                    EffectUtil.play(
+                            player,
+                            ConfigUtil.editLoreSound,
+                            ConfigUtil.editLoreSoundVolume,
+                            ConfigUtil.editLoreSoundPitch,
+                            ConfigUtil.editLoreParticle,
+                            ConfigUtil.editLoreParticleCount,
+                            ConfigUtil.editLoreParticleRadius
+                    );
 
                     ManageHomeGUI manageHomeGUI = new ManageHomeGUI(homeManager, home, player);
                     manageHomeGUI.open(player);
                 },
-                () -> player.sendMessage(ChatFormat.error("Lore input cancelled"))
+                () -> player.sendMessage(ChatFormat.error(
+                        PlaceholderUtil.replace(MessagesUtil.loreInputCancelled)
+                ))
         );
 
     }
@@ -229,27 +308,60 @@ public class ManageHomeGUI extends GUI {
         homeManager.update(home);
         ManageHomeGUI manageHomeGUI = new ManageHomeGUI(homeManager, home, player);
         manageHomeGUI.open(player);
-        player.sendMessage(ChatFormat.info("Successfully updated your home's location (" + LocationUtil.format(oldLocation) + " → " + LocationUtil.format(player.getLocation()) + ")"));
+        player.sendMessage(ChatFormat.info(
+                PlaceholderUtil.replace(
+                        MessagesUtil.homeLocationUpdated,
+                        "%old%", LocationUtil.format(oldLocation),
+                        "%new%", LocationUtil.format(player.getLocation())
+                )
+        ));
+        EffectUtil.play(
+                player,
+                ConfigUtil.editLocationSound,
+                ConfigUtil.editLocationSoundVolume,
+                ConfigUtil.editLocationSoundPitch,
+                ConfigUtil.editLocationParticle,
+                ConfigUtil.editLocationParticleCount,
+                ConfigUtil.editLocationParticleRadius
+        );
     }
 
     private void deleteHome() {
         player.closeInventory();
         H0M3.getInstance().getChatInputManager().awaitInput(
                 player,
-                "&c&lWARNING: Are you sure you want to delete your home? This action is IRREVERSIBLE\n&7Type '&aConfirm&7' to confirm",
+                PlaceholderUtil.replace(
+                        MessagesUtil.promptDeleteHome,
+                        "%confirm%", MessagesUtil.promptDeleteConfirmValue
+                ),
                 input -> {
-                    if (input.equalsIgnoreCase("confirm")) {
+                    if (input.equalsIgnoreCase(MessagesUtil.promptDeleteConfirmValue)) {
                         String name = home.getDisplayName();
                         homeManager.deleteHome(player.getUniqueId(), name);
-                        player.sendMessage(ChatFormat.info("Successfully deleted your home " + name));
+                        player.sendMessage(ChatFormat.info(
+                                PlaceholderUtil.replace(MessagesUtil.homeDeleted, "%name%", name)
+                        ));
+                        EffectUtil.play(
+                                player,
+                                ConfigUtil.deleteHomeSound,
+                                ConfigUtil.deleteHomeSoundVolume,
+                                ConfigUtil.deleteHomeSoundPitch,
+                                ConfigUtil.deleteHomeParticle,
+                                ConfigUtil.deleteHomeParticleCount,
+                                ConfigUtil.deleteHomeParticleRadius
+                        );
                         HomesGUI homesGUI = new HomesGUI(homeManager, player);
                         homesGUI.open(player);
                     } else {
-                        player.sendMessage(ChatFormat.error("Home deletion cancelled"));
+                        player.sendMessage(ChatFormat.error(
+                                PlaceholderUtil.replace(MessagesUtil.homeDeletionCancelled)
+                        ));
                         ManageHomeGUI manageHomeGUI = new ManageHomeGUI(homeManager, home, player);
                         manageHomeGUI.open(player);
                     }
-                }, () -> player.sendMessage(ChatFormat.error("Home deletion cancelled"))
+                }, () -> player.sendMessage(ChatFormat.error(
+                        PlaceholderUtil.replace(MessagesUtil.homeDeletionCancelled)
+                ))
         );
     }
 

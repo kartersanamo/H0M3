@@ -2,6 +2,8 @@ package com.sanamo.h0M3.managers;
 
 import com.sanamo.h0M3.H0M3;
 import com.sanamo.h0M3.api.chat.ColorUtil;
+import com.sanamo.h0M3.api.util.MessagesUtil;
+import com.sanamo.h0M3.api.util.PlaceholderUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -30,7 +32,12 @@ public class ChatInputManager implements Listener {
 
         // Send prompt
         player.sendMessage(ColorUtil.translate(prompt));
-        player.sendMessage(ColorUtil.translate("&7Type '&cCancel&7' to cancel"));
+        player.sendMessage(ColorUtil.translate(
+                PlaceholderUtil.replace(
+                        MessagesUtil.chatInputCancelHint,
+                        "%keyword%", MessagesUtil.chatInputCancelKeyword
+                )
+        ));
 
         // Store session
         activeSessions.put(uuid, new ChatInputSession(handler, cancelHandler));
@@ -52,7 +59,7 @@ public class ChatInputManager implements Listener {
         String message = event.getMessage().trim();
 
         // Handle cancellation
-        if (message.equalsIgnoreCase("cancel")) {
+        if (message.equalsIgnoreCase(MessagesUtil.chatInputCancelKeyword)) {
             activeSessions.remove(uuid);
             if (session.cancelHandler() != null) {
                 session.cancelHandler().run();

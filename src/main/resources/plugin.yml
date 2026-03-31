@@ -1,12 +1,17 @@
 name: H0M3
-version: '1.0.0'
+version: '1.0.1'
 main: com.sanamo.h0M3.H0M3
 api-version: '1.21'
 prefix: H0M3
-authors: [ KarterSanamo ]
-description: Home!
-website: logix.host
+author: KarterSanamo
+description: Homes for all!
+website: com.kartersanamo
+
 commands:
+  h0m3:
+    description: Core plugin commands
+    usage: /<command> <reload>
+    aliases: [ ]
   sethome:
     description: Sets a new home for the player
     usage: /<command> <name>

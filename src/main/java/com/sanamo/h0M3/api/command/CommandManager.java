@@ -12,6 +12,8 @@
  */
 package com.sanamo.h0M3.api.command;
 
+import com.sanamo.h0M3.api.util.MessagesUtil;
+import com.sanamo.h0M3.api.util.PlaceholderUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -95,7 +97,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 
                         // Check permission
                         if (sub.getPermission() != null && !sender.hasPermission(sub.getPermission())) {
-                            sender.sendMessage("You do not have permission to use this sub-command.");
+                            sender.sendMessage(PlaceholderUtil.replace(MessagesUtil.subCommandNoPermission));
                             return true;
                         }
 

@@ -1,5 +1,7 @@
 package com.sanamo.h0M3.api.chat;
 
+import com.sanamo.h0M3.api.util.MessagesUtil;
+
 public final class ChatFormat {
 
     // Prevent instantiation
@@ -18,18 +20,18 @@ public final class ChatFormat {
     }
 
     public static String error(String message) {
-        return format("&8&l[&4&lH0M3&8&l]", "&r&c" + message);
+        return format(MessagesUtil.chatPrefixDefault, "&r&c" + message);
     }
 
     public static String info(String message) {
-        return format("&8&l[&4&lH0M3&8&l]", "&r&7" + message);
+        return format(MessagesUtil.chatPrefixDefault, "&r&7" + message);
     }
 
     public static String success(String message) {
-        return format("&8&l[&a&lH0M3&8&l]", "&r&a" + message);
+        return format(MessagesUtil.chatPrefixSuccess, "&r&a" + message);
     }
 
     public static String warning(String message) {
-        return format("&8&l[&e&lH0M3&8&l]", "&r&e" + message);
+        return format(MessagesUtil.chatPrefixWarning, "&r&e" + message);
     }
 }

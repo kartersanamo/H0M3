@@ -1,0 +1,82 @@
+home:
+  max-number: 10
+  name:
+    min-length: 3
+    max-length: 16
+  default-material: "CHEST"
+
+gui:
+  manage-home:
+    size: 27
+  homes:
+    min-size: 9
+    max-rows: 6
+
+teleport:
+  delay:
+    enabled: false
+    seconds: 3
+    particle: "DRIPPING_LAVA"
+    particle-count: 40
+    particle-radius: 1.0
+    sound: "BLOCK_NOTE_BLOCK_BELL"
+    sound-volume: 1.0
+    sound-pitch: 1.0
+  complete:
+    particle: "HAPPY_VILLAGER"
+    particle-count: 40
+    particle-radius: 1.0
+    sound: "ENTITY_EXPERIENCE_ORB_PICKUP"
+    sound-volume: 1.0
+    sound-pitch: 1.0
+
+effects:
+  set-home:
+    sound: "ENTITY_EXPERIENCE_ORB_PICKUP"
+    sound-volume: 1.0
+    sound-pitch: 1.0
+    particle: "NONE"
+    particle-count: 40
+    particle-radius: 1.0
+  delete-home:
+    sound: "ENTITY_EXPERIENCE_ORB_PICKUP"
+    sound-volume: 1.0
+    sound-pitch: 1.0
+    particle: "NONE"
+    particle-count: 40
+    particle-radius: 1.0
+  rename-home:
+    sound: "ENTITY_EXPERIENCE_ORB_PICKUP"
+    sound-volume: 1.0
+    sound-pitch: 1.0
+    particle: "NONE"
+    particle-count: 40
+    particle-radius: 1.0
+  move-home:
+    sound: "ENTITY_EXPERIENCE_ORB_PICKUP"
+    sound-volume: 1.0
+    sound-pitch: 1.0
+    particle: "NONE"
+    particle-count: 40
+    particle-radius: 1.0
+  edit-material:
+    sound: "ENTITY_EXPERIENCE_ORB_PICKUP"
+    sound-volume: 1.0
+    sound-pitch: 1.0
+    particle: "NONE"
+    particle-count: 40
+    particle-radius: 1.0
+  edit-lore:
+    sound: "ENTITY_EXPERIENCE_ORB_PICKUP"
+    sound-volume: 1.0
+    sound-pitch: 1.0
+    particle: "NONE"
+    particle-count: 40
+    particle-radius: 1.0
+  edit-location:
+    sound: "ENTITY_EXPERIENCE_ORB_PICKUP"
+    sound-volume: 1.0
+    sound-pitch: 1.0
+    particle: "NONE"
+    particle-count: 40
+    particle-radius: 1.0

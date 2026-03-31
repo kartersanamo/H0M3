@@ -4,10 +4,12 @@ import com.sanamo.h0M3.api.chat.ChatFormat;
 import com.sanamo.h0M3.api.command.CommandContext;
 import com.sanamo.h0M3.api.command.CoreCommand;
 import com.sanamo.h0M3.api.command.annotations.PlayerOnly;
-import com.sanamo.h0M3.api.sound.SoundUtil;
+import com.sanamo.h0M3.api.util.ConfigUtil;
+import com.sanamo.h0M3.api.util.EffectUtil;
+import com.sanamo.h0M3.api.util.MessagesUtil;
+import com.sanamo.h0M3.api.util.PlaceholderUtil;
 import com.sanamo.h0M3.managers.HomeManager;
 import com.sanamo.h0M3.models.Home;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -34,20 +36,34 @@ public class DeleteHomeCommand extends CoreCommand {
         Player player = context.getPlayer();
         // Ensure they entered a name
         if (!context.hasArgs()) {
-            player.sendMessage(ChatFormat.error(this.getUsage()));
+            player.sendMessage(ChatFormat.error(
+                    PlaceholderUtil.replace(MessagesUtil.commandUsage, "%usage%", this.getUsage())
+            ));
             return true;
         }
 
         // Validate home name
         String homeName = context.getArg(0);
         if (!homeManager.exists(player.getUniqueId(), homeName)) {
-            player.sendMessage(ChatFormat.error("You do not have a home by the name of " + homeName));
+            player.sendMessage(ChatFormat.error(
+                    PlaceholderUtil.replace(MessagesUtil.homeNotFoundName, "%name%", homeName)
+            ));
             return true;
         }
 
         homeManager.deleteHome(player.getUniqueId(), homeName);
-        player.sendMessage(ChatFormat.info("Your home " + homeName + " has been deleted"));
-        SoundUtil.play(player, Sound.ENTITY_EXPERIENCE_ORB_PICKUP);
+        player.sendMessage(ChatFormat.info(
+                PlaceholderUtil.replace(MessagesUtil.homeDeleted, "%name%", homeName)
+        ));
+        EffectUtil.play(
+                player,
+                ConfigUtil.deleteHomeSound,
+                ConfigUtil.deleteHomeSoundVolume,
+                ConfigUtil.deleteHomeSoundPitch,
+                ConfigUtil.deleteHomeParticle,
+                ConfigUtil.deleteHomeParticleCount,
+                ConfigUtil.deleteHomeParticleRadius
+        );
 
         return true;
     }

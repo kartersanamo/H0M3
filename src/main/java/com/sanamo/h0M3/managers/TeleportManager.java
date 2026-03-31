@@ -4,10 +4,11 @@ import com.sanamo.h0M3.H0M3;
 import com.sanamo.h0M3.api.chat.ChatFormat;
 import com.sanamo.h0M3.api.particles.ParticleUtil;
 import com.sanamo.h0M3.api.sound.SoundUtil;
+import com.sanamo.h0M3.api.util.ConfigUtil;
 import com.sanamo.h0M3.api.util.LocationUtil;
+import com.sanamo.h0M3.api.util.MessagesUtil;
+import com.sanamo.h0M3.api.util.PlaceholderUtil;
 import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -16,8 +17,6 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class TeleportManager {
-    private static final int TELEPORT_TIME = 3;
-    private static final boolean teleportDelay = false;
     private static final HashMap<UUID, UUID> playerTeleports = new HashMap<>();
     private static final HashMap<UUID, Location> locationTeleports = new HashMap<>();
     private static final HashMap<UUID, BukkitTask> tasks = new HashMap<>();
@@ -28,9 +27,9 @@ public class TeleportManager {
     }
 
     private static void startTeleportCountdown(Player player, Location toLocation, Player target) {
-        if (teleportDelay) {
+        if (ConfigUtil.teleportDelayEnabled) {
             BukkitTask task = new BukkitRunnable() {
-                int timeLeft = TELEPORT_TIME;
+                int timeLeft = ConfigUtil.teleportDelaySeconds;
 
                 @Override
                 public void run() {
@@ -39,9 +38,20 @@ public class TeleportManager {
                         this.cancel();
                         return;
                     }
-                    player.sendMessage(ChatFormat.info("You will be teleported in " + timeLeft + "..."));
-                    ParticleUtil.spawnCircle(player.getLocation(), 1, Particle.DRIPPING_LAVA, 40);
-                    SoundUtil.play(player, Sound.BLOCK_NOTE_BLOCK_BELL);
+                    player.sendMessage(ChatFormat.info(
+                            PlaceholderUtil.replace(MessagesUtil.teleportCountdown, "%seconds%", String.valueOf(timeLeft))
+                    ));
+                    if (ConfigUtil.teleportDelayParticle != null) {
+                        ParticleUtil.spawnCircle(
+                                player.getLocation(),
+                                ConfigUtil.teleportDelayParticleRadius,
+                                ConfigUtil.teleportDelayParticle,
+                                ConfigUtil.teleportDelayParticleCount
+                        );
+                    }
+                    if (ConfigUtil.teleportDelaySound != null) {
+                        SoundUtil.play(player, ConfigUtil.teleportDelaySound, ConfigUtil.teleportDelaySoundVolume, ConfigUtil.teleportDelaySoundPitch);
+                    }
                     timeLeft -= 1;
                 }
             }.runTaskTimer(H0M3.getInstance(), 0L, 20L);
@@ -53,12 +63,28 @@ public class TeleportManager {
 
     private static void doTeleport(Player player, Location toLocation, Player target) {
         player.teleport(toLocation);
-        SoundUtil.play(player, Sound.ENTITY_EXPERIENCE_ORB_PICKUP);
-        ParticleUtil.spawnCircle(player.getLocation(), 1, Particle.HAPPY_VILLAGER, 40);
+        if (ConfigUtil.teleportCompleteSound != null) {
+            SoundUtil.play(player, ConfigUtil.teleportCompleteSound, ConfigUtil.teleportCompleteSoundVolume, ConfigUtil.teleportCompleteSoundPitch);
+        }
+        if (ConfigUtil.teleportCompleteParticle != null) {
+            ParticleUtil.spawnCircle(
+                    player.getLocation(),
+                    ConfigUtil.teleportCompleteParticleRadius,
+                    ConfigUtil.teleportCompleteParticle,
+                    ConfigUtil.teleportCompleteParticleCount
+            );
+        }
         if (target == null) {
-            player.sendMessage(ChatFormat.info("You have been teleported to " + LocationUtil.format(toLocation)));
+            player.sendMessage(ChatFormat.info(
+                    PlaceholderUtil.replace(
+                            MessagesUtil.teleportSuccessLocation,
+                            "%location%", LocationUtil.format(toLocation)
+                    )
+            ));
         } else {
-            player.sendMessage(ChatFormat.info("You have been teleported to " + target.getName()));
+            player.sendMessage(ChatFormat.info(
+                    PlaceholderUtil.replace(MessagesUtil.teleportSuccessPlayer, "%player%", target.getName())
+            ));
         }
         removeTeleport(player.getUniqueId());
     }
@@ -66,7 +92,9 @@ public class TeleportManager {
     public static void playerMoved(Player player) {
         tasks.get(player.getUniqueId()).cancel();
         removeTeleport(player.getUniqueId());
-        player.sendMessage(ChatFormat.error("You moved! Cancelling your teleportation request."));
+        player.sendMessage(ChatFormat.error(
+                PlaceholderUtil.replace(MessagesUtil.teleportCancelledMoved)
+        ));
     }
 
     public static boolean isPlayerTeleporting(Player player) {

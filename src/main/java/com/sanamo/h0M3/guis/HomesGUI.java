@@ -3,6 +3,9 @@ package com.sanamo.h0M3.guis;
 import com.sanamo.h0M3.api.chat.ColorUtil;
 import com.sanamo.h0M3.api.gui.GUI;
 import com.sanamo.h0M3.api.item.ItemBuilder;
+import com.sanamo.h0M3.api.util.ConfigUtil;
+import com.sanamo.h0M3.api.util.MessagesUtil;
+import com.sanamo.h0M3.api.util.PlaceholderUtil;
 import com.sanamo.h0M3.managers.HomeManager;
 import com.sanamo.h0M3.models.Home;
 import org.bukkit.Material;
@@ -23,9 +26,10 @@ public class HomesGUI extends GUI {
     public HomesGUI(HomeManager homeManager, Player player) {
         super("homes_gui",
                 ColorUtil.translate(
-                        "Homes ("
-                                + homeManager.getHomeCount(player.getUniqueId())
-                                + ")"),
+                        PlaceholderUtil.replace(
+                                MessagesUtil.homesGuiTitle,
+                                "%count%", String.valueOf(homeManager.getHomeCount(player.getUniqueId()))
+                        )),
                 calculateSize(homeManager, player)
         );
         this.homeManager = homeManager;
@@ -36,11 +40,11 @@ public class HomesGUI extends GUI {
     private static int calculateSize(HomeManager homeManager, Player player) {
         int homeCount = homeManager.getHomeCount(player.getUniqueId());
         if (homeCount == 0) {
-            return 9;
+            return ConfigUtil.homesGuiMinSize;
         }
 
-        int rows = Math.min(6, (int) Math.ceil(homeCount / 9.0));
-        return Math.max(9, rows * 9);
+        int rows = Math.min(ConfigUtil.homesGuiMaxRows, (int) Math.ceil(homeCount / 9.0));
+        return Math.max(ConfigUtil.homesGuiMinSize, rows * 9);
     }
 
     public void build() {
@@ -48,8 +52,8 @@ public class HomesGUI extends GUI {
 
         if (homes == null || homes.isEmpty()) {
             setItem(4, new ItemBuilder(Material.BARRIER)
-                    .name(ColorUtil.translate("&cNo Homes"))
-                    .lore(ColorUtil.translate("&7You have no homes created yet."))
+                    .name(ColorUtil.translate(MessagesUtil.homesGuiEmptyName))
+                    .lore(ColorUtil.translate(MessagesUtil.homesGuiEmptyLore))
                     .build());
             return;
         }
@@ -67,16 +71,21 @@ public class HomesGUI extends GUI {
                 for (String line : lore) {
                     displayLore.add(ColorUtil.translate(line));
                 }
-                displayLore.add(""); // Empty line separator
+                displayLore.add(ColorUtil.translate(MessagesUtil.blankLine)); // Empty line separator
             }
 
             // Add instruction lines
-            displayLore.add(ColorUtil.translate("&eLeft-Click &7to teleport"));
-            displayLore.add(ColorUtil.translate("&eRight-Click &7to manage"));
+            displayLore.add(ColorUtil.translate(MessagesUtil.homesGuiInstructionTeleport));
+            displayLore.add(ColorUtil.translate(MessagesUtil.homesGuiInstructionManage));
 
             // Create item
             ItemStack item = new ItemBuilder(home.getMaterial())
-                    .name(ColorUtil.translate("&6" + home.getDisplayName()))
+                    .name(ColorUtil.translate(
+                            PlaceholderUtil.replace(
+                                    MessagesUtil.homesGuiHomeName,
+                                    "%name%", home.getDisplayName()
+                            )
+                    ))
                     .lore(displayLore)
                     .build();
 

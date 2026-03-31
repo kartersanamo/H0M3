@@ -3,7 +3,11 @@ package com.sanamo.h0M3.commands;
 import com.sanamo.h0M3.api.chat.ChatFormat;
 import com.sanamo.h0M3.api.command.CommandContext;
 import com.sanamo.h0M3.api.command.CoreCommand;
+import com.sanamo.h0M3.api.util.ConfigUtil;
+import com.sanamo.h0M3.api.util.EffectUtil;
 import com.sanamo.h0M3.api.util.LocationUtil;
+import com.sanamo.h0M3.api.util.MessagesUtil;
+import com.sanamo.h0M3.api.util.PlaceholderUtil;
 import com.sanamo.h0M3.managers.HomeManager;
 import com.sanamo.h0M3.models.Home;
 import org.bukkit.Location;
@@ -32,7 +36,9 @@ public class MoveHomeCommand extends CoreCommand {
 
         Player player = context.getPlayer();
         if (!context.hasArgs()) {
-            player.sendMessage(ChatFormat.error(this.getUsage()));
+            player.sendMessage(ChatFormat.error(
+                    PlaceholderUtil.replace(MessagesUtil.commandUsage, "%usage%", this.getUsage())
+            ));
             return true;
         }
 
@@ -40,7 +46,9 @@ public class MoveHomeCommand extends CoreCommand {
         UUID playerUUID = player.getUniqueId();
 
         if (!homeManager.exists(playerUUID, homeName)) {
-            player.sendMessage(ChatFormat.error("You do not have a home by that name"));
+            player.sendMessage(ChatFormat.error(
+                    PlaceholderUtil.replace(MessagesUtil.homeNotFoundName, "%name%", homeName)
+            ));
             return true;
         }
 
@@ -50,7 +58,22 @@ public class MoveHomeCommand extends CoreCommand {
         home.setLocation(newLocation);
         homeManager.update(home);
 
-        player.sendMessage(ChatFormat.info("Successfully updated your home's location (" + LocationUtil.format(oldLocation) + " → " + LocationUtil.format(newLocation)));
+        player.sendMessage(ChatFormat.info(
+                PlaceholderUtil.replace(
+                        MessagesUtil.homeLocationUpdated,
+                        "%old%", LocationUtil.format(oldLocation),
+                        "%new%", LocationUtil.format(newLocation)
+                )
+        ));
+        EffectUtil.play(
+                player,
+                ConfigUtil.moveHomeSound,
+                ConfigUtil.moveHomeSoundVolume,
+                ConfigUtil.moveHomeSoundPitch,
+                ConfigUtil.moveHomeParticle,
+                ConfigUtil.moveHomeParticleCount,
+                ConfigUtil.moveHomeParticleRadius
+        );
 
         return true;
     }

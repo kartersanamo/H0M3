@@ -6,6 +6,8 @@ import com.sanamo.h0M3.api.command.annotations.CommandPermission;
 import com.sanamo.h0M3.api.command.annotations.PlayerOnly;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import com.sanamo.h0M3.api.util.MessagesUtil;
+import com.sanamo.h0M3.api.util.PlaceholderUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,16 +47,18 @@ public abstract class CoreCommand {
 
         // Check if player-only
         if (playerOnly && !(sender instanceof Player)) {
-            sender.sendMessage("This command can only be executed by players.");
+            sender.sendMessage(PlaceholderUtil.replace(MessagesUtil.commandPlayerOnly));
             return true;
         }
 
         // Check permission
         if (permission != null && !sender.hasPermission(permission)) {
             if (sender instanceof Player) {
-                sender.sendMessage(ChatFormat.error("You do not have permission to use this command."));
+                sender.sendMessage(ChatFormat.error(
+                        PlaceholderUtil.replace(MessagesUtil.commandNoPermission)
+                ));
             }
-            sender.sendMessage("You do not have permission to use this command.");
+            sender.sendMessage(PlaceholderUtil.replace(MessagesUtil.commandNoPermission));
             return true;
         }
 
@@ -62,7 +66,9 @@ public abstract class CoreCommand {
         try {
             return onExecute(context);
         } catch (Exception e) {
-            sender.sendMessage(ChatFormat.error("An error occurred while executing this command."));
+            sender.sendMessage(ChatFormat.error(
+                    PlaceholderUtil.replace(MessagesUtil.commandError)
+            ));
             H0M3.getLog().severe("An error occurred while executing the command " + getName());
             e.printStackTrace();
             return true;
@@ -88,7 +94,7 @@ public abstract class CoreCommand {
     }
 
     public String getUsage() {
-        return "Usage: " + usage;
+        return usage;
     }
 
     public List<String> getAliases() {

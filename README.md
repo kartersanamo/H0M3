@@ -1,4 +1,4 @@
-# H0M3 - v1.0.0
+# H0M3
 
 A comprehensive and feature-rich Spigot/Paper plugin for managing player homes in Minecraft. Players can create multiple customizable homes, teleport between them, and manage all their homes through an intuitive GUI interface.
 

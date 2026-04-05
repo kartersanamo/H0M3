@@ -36,8 +36,8 @@ public class ManageHomeGUI extends GUI {
     }
 
     private void build() {
-        // Change name item
 
+        // If home is null, show an error message
         if (home == null) {
             ItemStack nullItem = new ItemBuilder(Material.BARRIER)
                     .name(ColorUtil.translate(MessagesUtil.manageHomeErrorName))
@@ -50,8 +50,9 @@ public class ManageHomeGUI extends GUI {
                     .build();
             setItem(13, nullItem);
         }
-
         assert home != null;
+
+        // Change name item
         ItemStack changeNameItem = new ItemBuilder(Material.NAME_TAG)
                 .name(ColorUtil.translate(MessagesUtil.manageHomeChangeNameTitle))
                 .lore(List.of(

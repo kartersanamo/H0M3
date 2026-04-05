@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class ManageHomeGUI extends GUI {
 
@@ -59,12 +60,12 @@ public class ManageHomeGUI extends GUI {
                         ColorUtil.translate(MessagesUtil.manageHomeChangeNameLine1),
                         ColorUtil.translate(MessagesUtil.manageHomeChangeNameLine2),
                         ColorUtil.translate(MessagesUtil.blankLine),
-                        ColorUtil.translate(
+                        Objects.requireNonNull(ColorUtil.translate(
                                 PlaceholderUtil.replace(
                                         MessagesUtil.manageHomeCurrent,
                                         "%value%", home.getDisplayName()
                                 )
-                        )
+                        ))
                 ))
                 .build();
         setItem(11, changeNameItem);
@@ -77,12 +78,12 @@ public class ManageHomeGUI extends GUI {
                         ColorUtil.translate(MessagesUtil.manageHomeChangeMaterialLine1),
                         ColorUtil.translate(MessagesUtil.manageHomeChangeMaterialLine2),
                         ColorUtil.translate(MessagesUtil.blankLine),
-                        ColorUtil.translate(
+                        Objects.requireNonNull(ColorUtil.translate(
                                 PlaceholderUtil.replace(
                                         MessagesUtil.manageHomeCurrent,
                                         "%value%", home.getMaterial().toString()
                                 )
-                        )
+                        ))
                 ))
                 .build();
         setItem(12, changeMaterialItem);
@@ -123,12 +124,12 @@ public class ManageHomeGUI extends GUI {
                         ColorUtil.translate(MessagesUtil.manageHomeChangeLocationLine1),
                         ColorUtil.translate(MessagesUtil.manageHomeChangeLocationLine2),
                         ColorUtil.translate(MessagesUtil.blankLine),
-                        ColorUtil.translate(
+                        Objects.requireNonNull(ColorUtil.translate(
                                 PlaceholderUtil.replace(
                                         MessagesUtil.manageHomeCurrent,
                                         "%value%", LocationUtil.format(home.getLocation())
                                 )
-                        )
+                        ))
                 ))
                 .build();
         setItem(14, changeLocationItem);

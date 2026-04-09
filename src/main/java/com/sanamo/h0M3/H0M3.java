@@ -10,6 +10,7 @@ import com.sanamo.h0M3.api.util.ConfigUtil;
 import com.sanamo.h0M3.api.util.MessagesUtil;
 import com.sanamo.h0M3.api.util.PlaceholderUtil;
 import com.sanamo.h0M3.commands.*;
+import com.sanamo.h0M3.guis.AdminGUI;
 import com.sanamo.h0M3.listeners.PlayerJoinListener;
 import com.sanamo.h0M3.listeners.PlayerQuitListener;
 import com.sanamo.h0M3.listeners.TeleportMoveListener;
@@ -92,6 +93,28 @@ public final class H0M3 extends JavaPlugin {
                     return true;
                 }
         ));
+        commandManager.registerSubCommand("h0m3", new SubCommand(
+                "admin",
+                "Opens the admin homes manager GUI",
+                "/h0m3 admin [player]",
+                "h0m3.adminhomes",
+                context -> {
+                    if (!context.isPlayer()) {
+                        context.getSender().sendMessage(PlaceholderUtil.replace(MessagesUtil.commandPlayerOnly));
+                        return true;
+                    }
+
+                    Player player = context.getPlayer();
+                    if (!context.hasArgs()) {
+                        new AdminGUI(homeManager, player).open(player);
+                        return true;
+                    }
+
+                    com.sanamo.h0M3.commands.AdminHomesCommand.openTargetHomes(player, homeManager, context.getArg(0));
+                    return true;
+                },
+                "manage"
+        ));
         commandManager.registerCommand(new HomeCommand(homeManager));
         commandManager.registerCommand(new DeleteHomeCommand(homeManager));
         commandManager.registerCommand(new SetHomeCommand(homeManager));
@@ -100,6 +123,7 @@ public final class H0M3 extends JavaPlugin {
         commandManager.registerCommand(new MoveHomeCommand(homeManager));
         commandManager.registerCommand(new EditHomeCommand(homeManager));
         commandManager.registerCommand(new HomeInfoCommand(homeManager));
+        commandManager.registerCommand(new AdminHomesCommand(homeManager));
     }
 
     private void registerListeners() {

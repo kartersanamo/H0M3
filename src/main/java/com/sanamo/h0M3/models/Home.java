@@ -3,12 +3,12 @@ package com.sanamo.h0M3.models;
 import com.sanamo.h0M3.managers.TeleportManager;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
+import org.bukkit.OfflinePlayer;
 
 import java.util.List;
 
 public class Home {
-    private final Player owner;
+    private final OfflinePlayer owner;
     private final String id;
     private String displayName;
     private List<String> lore;
@@ -17,7 +17,7 @@ public class Home {
     private final long createdAt;
     private long lastUsedAt;
 
-    public Home(String id, Player owner, String displayName, List<String> lore, Material material, Location location, long createdAt, long lastUsedAt) {
+    public Home(String id, OfflinePlayer owner, String displayName, List<String> lore, Material material, Location location, long createdAt, long lastUsedAt) {
         this.owner = owner;
         this.displayName = displayName;
         this.lore = lore;
@@ -30,7 +30,9 @@ public class Home {
 
     public void teleport() {
         setLastUsedAt(System.currentTimeMillis());
-        TeleportManager.teleportToLocation(owner, location);
+        if (owner != null && owner.getPlayer() != null) {
+            TeleportManager.teleportToLocation(owner.getPlayer(), location);
+        }
     }
 
     public List<String> getLore() {
@@ -57,7 +59,7 @@ public class Home {
         location = newLocation;
     }
 
-    public Player getOwner() {
+    public OfflinePlayer getOwner() {
         return owner;
     }
 

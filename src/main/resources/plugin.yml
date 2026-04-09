@@ -10,7 +10,7 @@ website: com.kartersanamo
 commands:
   h0m3:
     description: Core plugin commands
-    usage: /<command> <reload>
+    usage: /<command> <reload|admin [player]>
     aliases: [ ]
   sethome:
     description: Sets a new home for the player
@@ -44,3 +44,7 @@ commands:
     description: Sends information on a player's home
     usage: /<command> <home>
     aliases: [ ]
+  adminhomes:
+    description: Opens the admin GUI for managing all players' homes
+    usage: /<command> [player]
+    aliases: [ ahomes ]

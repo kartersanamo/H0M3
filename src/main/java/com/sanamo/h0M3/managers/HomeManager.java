@@ -12,9 +12,11 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.io.File;
 import java.util.*;
 
 public class HomeManager {
@@ -30,6 +32,61 @@ public class HomeManager {
 
     private ConfigFile getPlayerFile(UUID uuid) {
         return new ConfigFile(plugin, "homes/" + uuid + ".yml");
+    }
+
+    public Set<UUID> getKnownHomeOwners() {
+        Set<UUID> ownerIds = new HashSet<>();
+        File homesDir = new File(plugin.getDataFolder(), "homes");
+        File[] files = homesDir.listFiles((dir, name) -> name.toLowerCase().endsWith(".yml"));
+
+        if (files == null) {
+            return ownerIds;
+        }
+
+        for (File file : files) {
+            String name = file.getName().substring(0, file.getName().length() - 4);
+            try {
+                ownerIds.add(UUID.fromString(name));
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+
+        return ownerIds;
+    }
+
+    public Set<String> getKnownHomeOwnerNames() {
+        Set<String> ownerNames = new HashSet<>();
+
+        for (UUID ownerId : getKnownHomeOwners()) {
+            OfflinePlayer offlinePlayer = plugin.getServer().getOfflinePlayer(ownerId);
+            if (offlinePlayer.getName() != null && !offlinePlayer.getName().isBlank()) {
+                ownerNames.add(offlinePlayer.getName());
+            }
+        }
+
+        return ownerNames;
+    }
+
+    public UUID resolvePlayerUuid(String playerName) {
+        if (playerName == null || playerName.isBlank()) {
+            return null;
+        }
+
+        for (Player player : plugin.getServer().getOnlinePlayers()) {
+            if (player.getName().equalsIgnoreCase(playerName)) {
+                return player.getUniqueId();
+            }
+        }
+
+        for (UUID ownerId : getKnownHomeOwners()) {
+            OfflinePlayer offlinePlayer = plugin.getServer().getOfflinePlayer(ownerId);
+            String name = offlinePlayer.getName();
+            if (name != null && name.equalsIgnoreCase(playerName)) {
+                return ownerId;
+            }
+        }
+
+        return null;
     }
 
     public void loadHomes(UUID uuid) {
@@ -62,10 +119,7 @@ public class HomeManager {
             }
 
             List<String> lore = homeSection.getStringList("lore");
-            Player owner = plugin.getServer().getPlayer(uuid);
-            if (owner == null) {
-                continue;
-            }
+            OfflinePlayer owner = plugin.getServer().getOfflinePlayer(uuid);
 
             long createdAt = homeSection.getLong("created-at");
             long lastUsedAt = homeSection.getLong("last-used-at");
@@ -126,6 +180,7 @@ public class HomeManager {
     }
 
     public Map<String, String> getHomeNameToId(UUID uuid) {
+        ensureLoaded(uuid);
         Map<String, String> homeNametoId = new HashMap<>();
         ConfigurationSection section = getSection(uuid);
         if (section == null) {
@@ -146,10 +201,12 @@ public class HomeManager {
     }
 
     public Map<String, Home> getHomes(UUID uuid) {
+        ensureLoaded(uuid);
         return homes.get(uuid);
     }
 
     public Home getHome(UUID uuid, String name) {
+        ensureLoaded(uuid);
         Map<String, String> nameToId = getNameToId(uuid);
         if (nameToId == null) {
             return null;
@@ -188,6 +245,7 @@ public class HomeManager {
     }
 
     public void deleteHome(UUID uniqueId, String homeName) {
+        ensureLoaded(uniqueId);
         Map<String, Home> playerHomes = homes.get(uniqueId);
         if (playerHomes == null) {
             return; // No homes for this player
@@ -203,6 +261,7 @@ public class HomeManager {
     }
 
     public int getHomeCount(UUID uuid) {
+        ensureLoaded(uuid);
         Map<String, Home> playerHomes = homes.get(uuid);
         return playerHomes != null ? playerHomes.size() : 0;
     }
@@ -265,5 +324,11 @@ public class HomeManager {
         }
 
         return lines;
+    }
+
+    private void ensureLoaded(UUID uuid) {
+        if (!homes.containsKey(uuid)) {
+            loadHomes(uuid);
+        }
     }
 }
